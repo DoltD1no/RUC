@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roblox Username Checker</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; padding: 20px; background-color: #f4f4f4; }
+        h1 { color: #333; }
+        .container { max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        form { margin: 20px 0; }
+        input[type="text"], select { padding: 10px; width: 200px; margin: 10px; }
+        input[type="submit"] { padding: 10px 20px; background-color: #007bff; color: white; border: none; cursor: pointer; }
+        input[type="submit"]:hover { background-color: #0056b3; }
+        .error { color: red; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Roblox Username Checker</h1>
+        <form method="POST">
+            <h3>Single Username Check</h3>
+            <input type="text" name="username" placeholder="Enter username" required>
+            <input type="hidden" name="check_type" value="single">
+            <input type="submit" value="Check Availability">
+        </form>
+        <form method="POST">
+            <h3>Bulk Username Check</h3>
+            <input type="number" name="length" placeholder="Username length (1-20)" required min="1" max="20">
+            <select name="username_type" required>
+                <option value="numbers">Numbers only</option>
+                <option value="letters">Letters only</option>
+                <option value="mixed">Letters and Numbers</option>
+            </select>
+            <input type="number" name="max_checks" placeholder="Max checks (1-20)" required min="1" max="20">
+            <input type="hidden" name="check_type" value="bulk">
+            <input type="submit" value="Start Bulk Check">
+        </form>
+        {% if error %}
+            <p class="error">{{ error }}</p>
+        {% endif %}
+    </div>
+</body>
+</html>
