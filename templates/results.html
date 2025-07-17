@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roblox Username Check Results</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; padding: 20px; background-color: #f4f4f4; }
+        h1 { color: #333; }
+        .container { max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        th, td { padding: 10px; border: 1px solid #ddd; }
+        th { background-color: #007bff; color: white; }
+        .available { color: green; font-weight: bold; }
+        .taken { color: red; }
+        .error { color: orange; }
+        a { color: #007bff; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Roblox Username Check Results</h1>
+        {% if results %}
+            <table>
+                <tr>
+                    <th>Username</th>
+                    <th>Status</th>
+                    <th>Links</th>
+                </tr>
+                {% for result in results %}
+                    <tr>
+                        <td>{{ result.username }}</td>
+                        <td class="{% if 'Available' in result.status %}available{% elif 'Taken' in result.status %}taken{% else %}error{% endif %}">
+                            {{ result.status }}
+                        </td>
+                        <td>
+                            <a href="{{ result.verify_url }}" target="_blank">Verify</a> |
+                            <a href="{{ result.signup_url }}" target="_blank">Sign Up</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </table>
+        {% else %}
+            <p>No available usernames found.</p>
+        {% endif %}
+        <a href="/">Back to Check</a>
+    </div>
+</body>
+</html>
