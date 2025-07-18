@@ -5,6 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Roblox Tools Hub</title>
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body { 
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
             background: linear-gradient(135deg, #1a1a1a, #2d2d2d); 
@@ -13,6 +19,7 @@
             padding: 20px; 
             min-height: 100vh;
         }
+
         .container { 
             max-width: 1200px; 
             margin: 0 auto; 
@@ -23,7 +30,11 @@
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); 
             transition: transform 0.3s ease;
         }
-        .container:hover { transform: scale(1.01); }
+
+        .container:hover { 
+            transform: scale(1.01); 
+        }
+
         h1 { 
             color: #d4a4eb; 
             text-align: center; 
@@ -31,168 +42,521 @@
             font-size: 3em; 
             text-shadow: 2px 2px 5px rgba(212, 164, 235, 0.3);
         }
+
         .tools-grid { 
             display: grid; 
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); 
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); 
             gap: 25px; 
             animation: fadeIn 1s ease-in;
         }
+
         .tool-card { 
-            background: #2a2a2a; 
-            padding: 20px; 
-            border-radius: 10px; 
+            background: linear-gradient(145deg, #2a2a2a, #1f1f1f); 
+            padding: 25px; 
+            border-radius: 15px; 
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); 
             transition: all 0.3s ease;
+            border: 1px solid #333;
         }
+
         .tool-card:hover { 
             transform: translateY(-5px); 
-            box-shadow: 0 8px 20px rgba(212, 164, 235, 0.4); 
-            background: #333;
+            box-shadow: 0 8px 25px rgba(212, 164, 235, 0.4); 
+            background: linear-gradient(145deg, #333, #2a2a2a);
         }
-        h3 { color: #b19cd9; margin-top: 0; text-shadow: 1px 1px 3px rgba(177, 156, 217, 0.3); }
-        .form-group { margin: 15px 0; }
-        input[type="text"], input[type="number"], select { 
-            padding: 12px; 
+
+        .tool-card h3 { 
+            color: #b19cd9; 
+            margin-bottom: 20px; 
+            text-shadow: 1px 1px 3px rgba(177, 156, 217, 0.3);
+            font-size: 1.3em;
+        }
+
+        .form-group { 
+            margin: 15px 0; 
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #b19cd9;
+            font-weight: 500;
+        }
+
+        input[type="text"], 
+        input[type="number"], 
+        select { 
+            padding: 12px 15px; 
             width: 100%; 
-            max-width: 250px; 
             margin: 5px 0; 
             background: #3a3a3a; 
-            border: 1px solid #555; 
+            border: 2px solid #555; 
             color: #e0e0e0; 
-            border-radius: 5px; 
-            transition: border-color 0.3s ease;
+            border-radius: 8px; 
+            transition: all 0.3s ease;
+            font-size: 14px;
         }
-        input[type="text"]:focus, input[type="number"]:focus, select:focus { border-color: #d4a4eb; }
-        input[type="submit"] { 
-            padding: 12px 25px; 
-            background: #d4a4eb; 
+
+        input[type="text"]:focus, 
+        input[type="number"]:focus, 
+        select:focus { 
+            border-color: #d4a4eb; 
+            outline: none;
+            box-shadow: 0 0 10px rgba(212, 164, 235, 0.3);
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: auto;
+            margin: 0;
+            transform: scale(1.2);
+            accent-color: #d4a4eb;
+        }
+
+        .checkbox-group label {
+            margin: 0;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .submit-btn { 
+            padding: 15px 30px; 
+            background: linear-gradient(135deg, #d4a4eb, #b19cd9); 
             color: #1a1a1a; 
             border: none; 
             cursor: pointer; 
-            border-radius: 5px; 
-            transition: background 0.3s ease, transform 0.2s ease;
+            border-radius: 8px; 
+            transition: all 0.3s ease;
+            font-weight: 600;
+            font-size: 16px;
+            width: 100%;
+            position: relative;
+            overflow: hidden;
         }
-        input[type="submit"]:hover { 
-            background: #b19cd9; 
-            transform: scale(1.05); 
+
+        .submit-btn:hover { 
+            background: linear-gradient(135deg, #b19cd9, #9d7cc9); 
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(212, 164, 235, 0.4);
         }
-        .error { color: #ff5555; text-align: center; animation: pulse 1.5s infinite; }
-        #recent-checks { margin-top: 30px; }
-        #recent-checks h3 { color: #d4a4eb; }
-        #recent-checks ul { list-style: none; padding: 0; }
-        #recent-checks li { padding: 10px; background: #2a2a2a; margin: 5px 0; border-radius: 5px; transition: background 0.3s ease; }
-        #recent-checks li:hover { background: #333; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .loading {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .loading::after {
+            content: '';
+            width: 20px;
+            height: 20px;
+            border: 2px solid #1a1a1a;
+            border-top: 2px solid transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error, .success, .info { 
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 8px;
+            text-align: center;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        .error {
+            background: rgba(255, 85, 85, 0.1);
+            border: 1px solid #ff5555;
+            color: #ff5555;
+        }
+
+        .success {
+            background: rgba(80, 250, 123, 0.1);
+            border: 1px solid #50fa7b;
+            color: #50fa7b;
+        }
+
+        .info {
+            background: rgba(139, 233, 253, 0.1);
+            border: 1px solid #8be9fd;
+            color: #8be9fd;
+        }
+
+        #recent-checks { 
+            margin-top: 40px; 
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 10px;
+        }
+
+        #recent-checks h3 { 
+            color: #d4a4eb; 
+            margin-bottom: 15px;
+            text-shadow: 1px 1px 3px rgba(212, 164, 235, 0.3);
+        }
+
+        #recent-checks ul { 
+            list-style: none; 
+            padding: 0; 
+        }
+
+        #recent-checks li { 
+            padding: 12px 15px; 
+            background: #2a2a2a; 
+            margin: 8px 0; 
+            border-radius: 8px; 
+            transition: all 0.3s ease;
+            border-left: 4px solid #d4a4eb;
+        }
+
+        #recent-checks li:hover { 
+            background: #333; 
+            transform: translateX(5px); 
+        }
+
+        .tooltip {
+            position: relative;
+            display: inline-block;
+            cursor: help;
+        }
+
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 200px;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -100px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 12px;
+        }
+
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        @keyframes fadeIn { 
+            from { opacity: 0; transform: translateY(20px); } 
+            to { opacity: 1; transform: translateY(0); } 
+        }
+
+        @keyframes slideIn { 
+            from { transform: translateY(-10px); opacity: 0; } 
+            to { transform: translateY(0); opacity: 1; } 
+        }
+
+        @media (max-width: 768px) {
+            .tools-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            h1 {
+                font-size: 2.5em;
+            }
+            
+            .container {
+                padding: 20px;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>My Roblox Tools Hub</h1>
+        
         <div class="tools-grid">
             <div class="tool-card">
-                <h3>Username Availability Check</h3>
-                <form id="single-form" method="POST">
+                <h3>🔍 Username Availability Check</h3>
+                <form id="single-form">
                     <div class="form-group">
-                        <input type="text" name="username" placeholder="Enter username" required>
-                        <input type="hidden" name="check_type" value="single">
-                        <input type="submit" value="Check Now">
+                        <label for="username">Enter Username:</label>
+                        <input type="text" id="username" name="username" placeholder="Enter username" required>
                     </div>
+                    
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="use-glitch" name="use_glitch">
+                        <label for="use-glitch" class="tooltip">
+                            Use Glitch Method (Advanced)
+                            <span class="tooltiptext">Uses multiple validation attempts to bypass some restrictions. Takes longer but may find available usernames that appear taken.</span>
+                        </label>
+                    </div>
+                    
+                    <button type="submit" class="submit-btn">
+                        <span class="btn-text">Check Username</span>
+                        <div class="loading"></div>
+                    </button>
                 </form>
             </div>
+
             <div class="tool-card">
-                <h3>Bulk Username Generator</h3>
-                <form id="bulk-form" method="POST">
+                <h3>🎲 Bulk Username Generator</h3>
+                <form id="bulk-form">
                     <div class="form-group">
-                        <input type="number" name="length" placeholder="Length (1-20)" required min="1" max="20">
-                        <select name="username_type" required>
-                            <option value="numbers">Numbers only</option>
-                            <option value="letters">Letters only</option>
-                            <option value="mixed">Letters and Numbers</option>
-                        </select>
-                        <input type="number" name="max_checks" placeholder="Max checks (1-20)" required min="1" max="20">
-                        <input type="hidden" name="check_type" value="bulk">
-                        <input type="submit" value="Generate Now">
+                        <label for="length">Username Length:</label>
+                        <input type="number" id="length" name="length" placeholder="Length (1-20)" required min="1" max="20" value="6">
                     </div>
+                    
+                    <div class="form-group">
+                        <label for="username_type">Username Type:</label>
+                        <select id="username_type" name="username_type" required>
+                            <option value="mixed">Letters and Numbers</option>
+                            <option value="letters">Letters Only</option>
+                            <option value="numbers">Numbers Only</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="max_checks">Max Checks:</label>
+                        <input type="number" id="max_checks" name="max_checks" placeholder="Max checks (1-20)" required min="1" max="20" value="10">
+                    </div>
+                    
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="use-glitch-bulk" name="use_glitch">
+                        <label for="use-glitch-bulk" class="tooltip">
+                            Use Glitch Method (Advanced)
+                            <span class="tooltiptext">Applies glitch method to generated usernames. Significantly increases processing time.</span>
+                        </label>
+                    </div>
+                    
+                    <button type="submit" class="submit-btn">
+                        <span class="btn-text">Generate Usernames</span>
+                        <div class="loading"></div>
+                    </button>
                 </form>
             </div>
         </div>
-        {% if error %}
-            <p class="error">{{ error }}</p>
-        {% endif %}
+
+        <div id="message-container"></div>
+
         <div id="recent-checks">
-            <h3>Recent Activity</h3>
-            <ul id="recent-checks-list"></ul>
+            <h3>📊 Recent Activity</h3>
+            <ul id="recent-checks-list">
+                <li style="text-align: center; color: #888;">No recent checks yet</li>
+            </ul>
         </div>
     </div>
+
     <script>
+        function showMessage(message, type = 'info') {
+            const container = document.getElementById('message-container');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = type;
+            messageDiv.textContent = message;
+            container.innerHTML = '';
+            container.appendChild(messageDiv);
+            
+            setTimeout(() => {
+                messageDiv.remove();
+            }, 5000);
+        }
+
+        function setLoading(form, isLoading) {
+            const btn = form.querySelector('.submit-btn');
+            const btnText = btn.querySelector('.btn-text');
+            const loading = btn.querySelector('.loading');
+            
+            if (isLoading) {
+                btn.disabled = true;
+                btnText.style.opacity = '0';
+                loading.style.display = 'block';
+            } else {
+                btn.disabled = false;
+                btnText.style.opacity = '1';
+                loading.style.display = 'none';
+            }
+        }
+
         document.getElementById('single-form').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const formData = new FormData(e.target);
-            const response = await fetch('/', {
-                method: 'POST',
-                body: formData
-            });
-            const data = await response.json();
-            if (data && data.status) {
-                let recentChecks = JSON.parse(localStorage.getItem('recentChecks') || '[]');
-                recentChecks.unshift(data);
-                if (recentChecks.length > 5) recentChecks.pop();
-                localStorage.setItem('recentChecks', JSON.stringify(recentChecks));
-                updateRecentChecks();
-                const result = await response.text();
-                document.open();
-                document.write(result);
-                document.close();
+            
+            const form = e.target;
+            const formData = new FormData(form);
+            const username = formData.get('username').trim();
+            
+            if (!username) {
+                showMessage('Please enter a username.', 'error');
+                return;
+            }
+            
+            setLoading(form, true);
+            
+            try {
+                const response = await fetch('/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: new URLSearchParams({
+                        check_type: 'single',
+                        username: username,
+                        use_glitch: formData.get('use_glitch') ? 'true' : 'false'
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data && data.status) {
+                    // Add to recent checks
+                    let recentChecks = JSON.parse(localStorage.getItem('recentChecks') || '[]');
+                    recentChecks.unshift({
+                        username: data.username,
+                        status: data.status,
+                        verify_url: data.verify_url,
+                        signup_url: data.signup_url,
+                        timestamp: new Date().toLocaleString()
+                    });
+                    
+                    if (recentChecks.length > 10) recentChecks.pop();
+                    localStorage.setItem('recentChecks', JSON.stringify(recentChecks));
+                    updateRecentChecks();
+                    
+                    // Show result
+                    const isAvailable = data.status.includes('Available');
+                    showMessage(`${username}: ${data.status}`, isAvailable ? 'success' : 'error');
+                } else {
+                    showMessage('Failed to check username. Please try again.', 'error');
+                }
+            } catch (error) {
+                showMessage('Network error. Please check your connection and try again.', 'error');
+            } finally {
+                setLoading(form, false);
             }
         });
 
         document.getElementById('bulk-form').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const formData = new FormData(e.target);
-            const response = await fetch('/', {
-                method: 'POST',
-                body: formData
-            });
-            const data = await response.json();
-            if (data && data.results) {
-                let recentChecks = JSON.parse(localStorage.getItem('recentChecks') || '[]');
-                recentChecks.unshift({ username: `Bulk Check (Length: ${formData.get('length')})`, status: data.summary, verify_url: '', signup_url: '' });
-                if (recentChecks.length > 5) recentChecks.pop();
-                localStorage.setItem('recentChecks', JSON.stringify(recentChecks));
-                updateRecentChecks();
-                const result = await response.text();
-                document.open();
-                document.write(result);
-                document.close();
+            
+            const form = e.target;
+            const formData = new FormData(form);
+            
+            setLoading(form, true);
+            showMessage('Generating usernames... This may take a while.', 'info');
+            
+            try {
+                const response = await fetch('/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: new URLSearchParams({
+                        check_type: 'bulk',
+                        length: formData.get('length'),
+                        username_type: formData.get('username_type'),
+                        max_checks: formData.get('max_checks'),
+                        use_glitch: formData.get('use_glitch') ? 'true' : 'false'
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data && data.results) {
+                    // Add to recent checks
+                    let recentChecks = JSON.parse(localStorage.getItem('recentChecks') || '[]');
+                    recentChecks.unshift({
+                        username: `Bulk Check (${data.results.length} found)`,
+                        status: data.summary,
+                        verify_url: '',
+                        signup_url: '',
+                        timestamp: new Date().toLocaleString()
+                    });
+                    
+                    if (recentChecks.length > 10) recentChecks.pop();
+                    localStorage.setItem('recentChecks', JSON.stringify(recentChecks));
+                    updateRecentChecks();
+                    
+                    // Redirect to results page
+                    const resultsForm = document.createElement('form');
+                    resultsForm.method = 'POST';
+                    resultsForm.action = '/results';
+                    resultsForm.style.display = 'none';
+                    
+                    const resultsInput = document.createElement('input');
+                    resultsInput.type = 'hidden';
+                    resultsInput.name = 'results';
+                    resultsInput.value = JSON.stringify(data.results);
+                    
+                    resultsForm.appendChild(resultsInput);
+                    document.body.appendChild(resultsForm);
+                    resultsForm.submit();
+                } else {
+                    showMessage('No available usernames found. Try different parameters.', 'error');
+                }
+            } catch (error) {
+                showMessage('Network error. Please check your connection and try again.', 'error');
+            } finally {
+                setLoading(form, false);
             }
         });
 
         function updateRecentChecks() {
             const recentChecks = JSON.parse(localStorage.getItem('recentChecks') || '[]');
             const list = document.getElementById('recent-checks-list');
+            
+            if (recentChecks.length === 0) {
+                list.innerHTML = '<li style="text-align: center; color: #888;">No recent checks yet</li>';
+                return;
+            }
+            
             list.innerHTML = '';
             recentChecks.forEach(check => {
                 const li = document.createElement('li');
-                li.textContent = `${check.username}: ${check.status}`;
+                li.innerHTML = `
+                    <strong>${check.username}</strong>: ${check.status}
+                    <small style="float: right; color: #888;">${check.timestamp}</small>
+                `;
+                
                 if (check.verify_url) {
                     const verifyLink = document.createElement('a');
                     verifyLink.href = check.verify_url;
                     verifyLink.textContent = ' [Verify]';
                     verifyLink.target = '_blank';
+                    verifyLink.style.marginLeft = '10px';
+                    verifyLink.style.color = '#d4a4eb';
                     li.appendChild(verifyLink);
                 }
+                
                 if (check.signup_url) {
                     const signupLink = document.createElement('a');
                     signupLink.href = check.signup_url;
                     signupLink.textContent = ' [Sign Up]';
                     signupLink.target = '_blank';
+                    signupLink.style.marginLeft = '5px';
+                    signupLink.style.color = '#50fa7b';
                     li.appendChild(signupLink);
                 }
+                
                 list.appendChild(li);
             });
         }
 
+        // Initialize recent checks on page load
         updateRecentChecks();
     </script>
 </body>
