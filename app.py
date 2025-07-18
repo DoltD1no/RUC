@@ -172,7 +172,7 @@ def index():
             if status == "Username Not Appropriate":
                 status = check_username_validation_glitch(username, max_cycles=10)
             result = {"username": username, "status": status, "verify_url": f"https://www.roblox.com/search/users?keyword={username}", "signup_url": f"https://www.roblox.com/account/signupredir?username={username}"}
-            return jsonify(result)
+            return render_template("results.html", results=[result])
         elif check_type == "bulk":
             try:
                 length = int(request.form.get("length"))
@@ -201,8 +201,12 @@ def index():
                 time.sleep(1)
                 if len(results) >= 5:
                     break
-            return jsonify({"results": results, "summary": f"{len(results)} available"})
+            return render_template("results.html", results=results)
     return render_template("index.html", error=None)
+
+@app.route("/results")
+def results():
+    return render_template("results.html")
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8080)
