@@ -3,48 +3,144 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Roblox Username Check Results</title>
+    <title>My Roblox Username Tool - Results</title>
     <style>
-        body { font-family: Arial, sans-serif; text-align: center; padding: 20px; background-color: #f4f4f4; }
-        h1 { color: #333; }
-        .container { max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
-        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
-        th, td { padding: 10px; border: 1px solid #ddd; }
-        th { background-color: #007bff; color: white; }
-        .available { color: green; font-weight: bold; }
-        .taken { color: red; }
-        .error { color: orange; }
-        a { color: #007bff; text-decoration: none; }
+        body { 
+            font-family: Arial, sans-serif; 
+            background: #1a1a1a; 
+            color: #e0e0e0; 
+            margin: 0; 
+            padding: 20px; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            min-height: 100vh;
+        }
+        .container { 
+            background: rgba(255, 255, 255, 0.05); 
+            padding: 30px; 
+            border-radius: 10px; 
+            backdrop-filter: blur(10px); 
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5); 
+            max-width: 800px; 
+            width: 100%;
+        }
+        h1 { 
+            color: #d4a4eb; 
+            text-align: center; 
+            margin-bottom: 20px; 
+            font-size: 2.5em;
+        }
+        table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            margin: 20px 0; 
+            background: #2a2a2a; 
+        }
+        th, td { 
+            padding: 12px; 
+            border: 1px solid #444; 
+            text-align: left;
+        }
+        th { background: #d4a4eb; color: #1a1a1a; }
+        .available { color: #50fa7b; }
+        .taken { color: #ff5555; }
+        .error { color: #ff79c6; }
+        a { color: #d4a4eb; text-decoration: none; }
         a:hover { text-decoration: underline; }
+        #recent-checks { margin-top: 20px; }
+        #recent-checks ul { list-style: none; padding: 0; }
+        #recent-checks li { padding: 5px 0; }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Roblox Username Check Results</h1>
-        {% if results %}
-            <table>
-                <tr>
-                    <th>Username</th>
-                    <th>Status</th>
-                    <th>Links</th>
-                </tr>
-                {% for result in results %}
+        <h1>My Roblox Username Tool - Results</h1>
+        {% if request.args.get('bulk') %}
+            {% set results = request.args.get('results') | fromjson %}
+            {% if results %}
+                <table>
                     <tr>
-                        <td>{{ result.username }}</td>
-                        <td class="{% if 'Available' in result.status %}available{% elif 'Taken' in result.status %}taken{% else %}error{% endif %}">
-                            {{ result.status }}
+                        <th>Username</th>
+                        <th>Status</th>
+                        <th>Links</th>
+                    </tr>
+                    {% for result in results %}
+                        <tr>
+                            <td>{{ result.username }}</td>
+                            <td class="{% if 'Available' in result.status %}available{% elif 'Taken' in result.status %}taken{% else %}error{% endif %}">
+                                {{ result.status }}
+                            </td>
+                            <td>
+                                <a href="{{ result.verify_url }}" target="_blank">Verify</a> |
+                                <a href="{{ result.signup_url }}" target="_blank">Sign Up</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            {% else %}
+                <p>No available usernames found.</p>
+            {% endif %}
+        {% else %}
+            {% set username = request.args.get('username') %}
+            {% set status = request.args.get('status') %}
+            {% set verify_url = request.args.get('verify_url') %}
+            {% set signup_url = request.args.get('signup_url') %}
+            {% if username and status %}
+                <table>
+                    <tr>
+                        <th>Username</th>
+                        <th>Status</th>
+                        <th>Links</th>
+                    </tr>
+                    <tr>
+                        <td>{{ username }}</td>
+                        <td class="{% if 'Available' in status %}available{% elif 'Taken' in status %}taken{% else %}error{% endif %}">
+                            {{ status }}
                         </td>
                         <td>
-                            <a href="{{ result.verify_url }}" target="_blank">Verify</a> |
-                            <a href="{{ result.signup_url }}" target="_blank">Sign Up</a>
+                            <a href="{{ verify_url }}" target="_blank">Verify</a> |
+                            <a href="{{ signup_url }}" target="_blank">Sign Up</a>
                         </td>
                     </tr>
-                {% endfor %}
-            </table>
-        {% else %}
-            <p>No available usernames found.</p>
+                </table>
+            {% else %}
+                <p>No results to display.</p>
+            {% endif %}
         {% endif %}
-        <a href="/">Back to Check</a>
+        <div id="recent-checks">
+            <h3>Recent Checks</h3>
+            <ul id="recent-checks-list"></ul>
+        </div>
+        <a href="/" style="display: block; text-align: center; margin-top: 20px;">Back to Check</a>
     </div>
+    <script>
+        function updateRecentChecks() {
+            const recentChecks = JSON.parse(localStorage.getItem('recentChecks') || '[]');
+            const list = document.getElementById('recent-checks-list');
+            list.innerHTML = '';
+            recentChecks.forEach(check => {
+                const li = document.createElement('li');
+                li.textContent = `${check.username}: ${check.status}`;
+                if (check.verify_url) {
+                    const verifyLink = document.createElement('a');
+                    verifyLink.href = check.verify_url;
+                    verifyLink.textContent = ' [Verify]';
+                    verifyLink.target = '_blank';
+                    li.appendChild(verifyLink);
+                }
+                if (check.signup_url) {
+                    const signupLink = document.createElement('a');
+                    signupLink.href = check.signup_url;
+                    signupLink.textContent = ' [Sign Up]';
+                    signupLink.target = '_blank';
+                    li.appendChild(signupLink);
+                }
+                list.appendChild(li);
+            });
+        }
+
+        updateRecentChecks();
+    </script>
 </body>
 </html>
