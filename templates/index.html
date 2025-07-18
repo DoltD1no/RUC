@@ -3,42 +3,159 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Roblox Username Checker</title>
+    <title>My Roblox Username Tool</title>
     <style>
-        body { font-family: Arial, sans-serif; text-align: center; padding: 20px; background-color: #f4f4f4; }
-        h1 { color: #333; }
-        .container { max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
-        form { margin: 20px 0; }
-        input[type="text"], select { padding: 10px; width: 200px; margin: 10px; }
-        input[type="submit"] { padding: 10px 20px; background-color: #007bff; color: white; border: none; cursor: pointer; }
-        input[type="submit"]:hover { background-color: #0056b3; }
-        .error { color: red; }
+        body { 
+            font-family: Arial, sans-serif; 
+            background: #1a1a1a; 
+            color: #e0e0e0; 
+            margin: 0; 
+            padding: 20px; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            min-height: 100vh;
+        }
+        .container { 
+            background: rgba(255, 255, 255, 0.05); 
+            padding: 30px; 
+            border-radius: 10px; 
+            backdrop-filter: blur(10px); 
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5); 
+            max-width: 800px; 
+            width: 100%;
+        }
+        h1 { 
+            color: #d4a4eb; 
+            text-align: center; 
+            margin-bottom: 20px; 
+            font-size: 2.5em;
+        }
+        h3 { color: #b19cd9; margin-top: 20px; }
+        .form-group { margin: 15px 0; }
+        input[type="text"], input[type="number"], select { 
+            padding: 10px; 
+            width: 200px; 
+            margin-right: 10px; 
+            background: #2a2a2a; 
+            border: 1px solid #444; 
+            color: #e0e0e0; 
+            border-radius: 5px;
+        }
+        input[type="submit"] { 
+            padding: 10px 20px; 
+            background: #d4a4eb; 
+            color: #1a1a1a; 
+            border: none; 
+            cursor: pointer; 
+            border-radius: 5px;
+        }
+        input[type="submit"]:hover { background: #b19cd9; }
+        .error { color: #ff5555; text-align: center; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+        #recent-checks { margin-top: 20px; }
+        #recent-checks ul { list-style: none; padding: 0; }
+        #recent-checks li { padding: 5px 0; }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Roblox Username Checker</h1>
-        <form method="POST">
-            <h3>Single Username Check</h3>
-            <input type="text" name="username" placeholder="Enter username" required>
-            <input type="hidden" name="check_type" value="single">
-            <input type="submit" value="Check Availability">
-        </form>
-        <form method="POST">
-            <h3>Bulk Username Check</h3>
-            <input type="number" name="length" placeholder="Username length (1-20)" required min="1" max="20">
-            <select name="username_type" required>
-                <option value="numbers">Numbers only</option>
-                <option value="letters">Letters only</option>
-                <option value="mixed">Letters and Numbers</option>
-            </select>
-            <input type="number" name="max_checks" placeholder="Max checks (1-20)" required min="1" max="20">
-            <input type="hidden" name="check_type" value="bulk">
-            <input type="submit" value="Start Bulk Check">
-        </form>
+        <h1>My Roblox Username Tool</h1>
+        <div class="grid">
+            <div class="form-group">
+                <h3>Single Username Check</h3>
+                <form id="single-form" method="POST">
+                    <input type="text" name="username" placeholder="Enter username" required>
+                    <input type="hidden" name="check_type" value="single">
+                    <input type="submit" value="Check Availability">
+                </form>
+            </div>
+            <div class="form-group">
+                <h3>Bulk Username Check</h3>
+                <form id="bulk-form" method="POST">
+                    <input type="number" name="length" placeholder="Length (1-20)" required min="1" max="20">
+                    <select name="username_type" required>
+                        <option value="numbers">Numbers only</option>
+                        <option value="letters">Letters only</option>
+                        <option value="mixed">Letters and Numbers</option>
+                    </select>
+                    <input type="number" name="max_checks" placeholder="Max checks (1-20)" required min="1" max="20">
+                    <input type="hidden" name="check_type" value="bulk">
+                    <input type="submit" value="Start Bulk Check">
+                </form>
+            </div>
+        </div>
         {% if error %}
             <p class="error">{{ error }}</p>
         {% endif %}
+        <div id="recent-checks">
+            <h3>Recent Checks</h3>
+            <ul id="recent-checks-list"></ul>
+        </div>
     </div>
+    <script>
+        document.getElementById('single-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const response = await fetch('/', {
+                method: 'POST',
+                body: formData
+            });
+            const data = await response.json();
+            if (data.status) {
+                let recentChecks = JSON.parse(localStorage.getItem('recentChecks') || '[]');
+                recentChecks.unshift(data);
+                if (recentChecks.length > 5) recentChecks.pop();
+                localStorage.setItem('recentChecks', JSON.stringify(recentChecks));
+                updateRecentChecks();
+                window.location.href = `/results?username=${encodeURIComponent(data.username)}&status=${encodeURIComponent(data.status)}&verify_url=${encodeURIComponent(data.verify_url)}&signup_url=${encodeURIComponent(data.signup_url)}`;
+            }
+        });
+
+        document.getElementById('bulk-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const response = await fetch('/', {
+                method: 'POST',
+                body: formData
+            });
+            const data = await response.json();
+            if (data.results) {
+                let recentChecks = JSON.parse(localStorage.getItem('recentChecks') || '[]');
+                recentChecks.unshift({ username: `Bulk Check (Length: ${formData.get('length')})`, status: data.summary, verify_url: '', signup_url: '' });
+                if (recentChecks.length > 5) recentChecks.pop();
+                localStorage.setItem('recentChecks', JSON.stringify(recentChecks));
+                updateRecentChecks();
+                window.location.href = `/results?bulk=true&results=${encodeURIComponent(JSON.stringify(data.results))}`;
+            }
+        });
+
+        function updateRecentChecks() {
+            const recentChecks = JSON.parse(localStorage.getItem('recentChecks') || '[]');
+            const list = document.getElementById('recent-checks-list');
+            list.innerHTML = '';
+            recentChecks.forEach(check => {
+                const li = document.createElement('li');
+                li.textContent = `${check.username}: ${check.status}`;
+                if (check.verify_url) {
+                    const verifyLink = document.createElement('a');
+                    verifyLink.href = check.verify_url;
+                    verifyLink.textContent = ' [Verify]';
+                    verifyLink.target = '_blank';
+                    li.appendChild(verifyLink);
+                }
+                if (check.signup_url) {
+                    const signupLink = document.createElement('a');
+                    signupLink.href = check.signup_url;
+                    signupLink.textContent = ' [Sign Up]';
+                    signupLink.target = '_blank';
+                    li.appendChild(signupLink);
+                }
+                list.appendChild(li);
+            });
+        }
+
+        updateRecentChecks();
+    </script>
 </body>
 </html>
