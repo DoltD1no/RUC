@@ -56,57 +56,28 @@
 <body>
     <div class="container">
         <h1>My Roblox Username Tool - Results</h1>
-        {% if request.args.get('bulk') %}
-            {% set results = request.args.get('results') | fromjson %}
-            {% if results %}
-                <table>
+        {% if results %}
+            <table>
+                <tr>
+                    <th>Username</th>
+                    <th>Status</th>
+                    <th>Links</th>
+                </tr>
+                {% for result in results %}
                     <tr>
-                        <th>Username</th>
-                        <th>Status</th>
-                        <th>Links</th>
-                    </tr>
-                    {% for result in results %}
-                        <tr>
-                            <td>{{ result.username }}</td>
-                            <td class="{% if 'Available' in result.status %}available{% elif 'Taken' in result.status %}taken{% else %}error{% endif %}">
-                                {{ result.status }}
-                            </td>
-                            <td>
-                                <a href="{{ result.verify_url }}" target="_blank">Verify</a> |
-                                <a href="{{ result.signup_url }}" target="_blank">Sign Up</a>
-                            </td>
-                        </tr>
-                    {% endfor %}
-                </table>
-            {% else %}
-                <p>No available usernames found.</p>
-            {% endif %}
-        {% else %}
-            {% set username = request.args.get('username') %}
-            {% set status = request.args.get('status') %}
-            {% set verify_url = request.args.get('verify_url') %}
-            {% set signup_url = request.args.get('signup_url') %}
-            {% if username and status %}
-                <table>
-                    <tr>
-                        <th>Username</th>
-                        <th>Status</th>
-                        <th>Links</th>
-                    </tr>
-                    <tr>
-                        <td>{{ username }}</td>
-                        <td class="{% if 'Available' in status %}available{% elif 'Taken' in status %}taken{% else %}error{% endif %}">
-                            {{ status }}
+                        <td>{{ result.username }}</td>
+                        <td class="{% if 'Available' in result.status %}available{% elif 'Taken' in result.status %}taken{% else %}error{% endif %}">
+                            {{ result.status }}
                         </td>
                         <td>
-                            <a href="{{ verify_url }}" target="_blank">Verify</a> |
-                            <a href="{{ signup_url }}" target="_blank">Sign Up</a>
+                            <a href="{{ result.verify_url }}" target="_blank">Verify</a> |
+                            <a href="{{ result.signup_url }}" target="_blank">Sign Up</a>
                         </td>
                     </tr>
-                </table>
-            {% else %}
-                <p>No results to display.</p>
-            {% endif %}
+                {% endfor %}
+            </table>
+        {% else %}
+            <p>No results to display.</p>
         {% endif %}
         <div id="recent-checks">
             <h3>Recent Checks</h3>
