@@ -5,6 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Roblox Tools Hub - Results</title>
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body { 
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
             background: linear-gradient(135deg, #1a1a1a, #2d2d2d); 
@@ -13,6 +19,7 @@
             padding: 20px; 
             min-height: 100vh;
         }
+
         .container { 
             max-width: 1200px; 
             margin: 0 auto; 
@@ -23,7 +30,11 @@
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); 
             transition: transform 0.3s ease;
         }
-        .container:hover { transform: scale(1.01); }
+
+        .container:hover { 
+            transform: scale(1.01); 
+        }
+
         h1 { 
             color: #d4a4eb; 
             text-align: center; 
@@ -31,94 +42,393 @@
             font-size: 3em; 
             text-shadow: 2px 2px 5px rgba(212, 164, 235, 0.3);
         }
+
+        .results-summary {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .results-summary h2 {
+            color: #b19cd9;
+            margin-bottom: 10px;
+        }
+
+        .results-summary .stats {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 15px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #d4a4eb;
+            text-shadow: 0 0 10px rgba(212, 164, 235, 0.3);
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            color: #888;
+        }
+
+        .results-table-container {
+            overflow-x: auto;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
         table { 
             width: 100%; 
             border-collapse: collapse; 
-            margin: 20px 0; 
             background: #2a2a2a; 
             animation: slideIn 1s ease-out;
         }
+
         th, td { 
             padding: 15px; 
-            border: 1px solid #555; 
             text-align: left; 
             transition: background 0.3s ease;
         }
-        th { background: #d4a4eb; color: #1a1a1a; }
-        td:hover { background: #333; }
-        .available { color: #50fa7b; text-shadow: 0 0 5px #50fa7b; }
-        .taken { color: #ff5555; text-shadow: 0 0 5px #ff5555; }
-        .error { color: #ff79c6; text-shadow: 0 0 5px #ff79c6; }
-        a { color: #d4a4eb; text-decoration: none; transition: color 0.3s ease; }
-        a:hover { color: #b19cd9; text-shadow: 0 0 10px #b19cd9; }
-        #recent-checks { margin-top: 30px; }
-        #recent-checks h3 { color: #d4a4eb; text-shadow: 1px 1px 3px #d4a4eb; }
-        #recent-checks ul { list-style: none; padding: 0; }
-        #recent-checks li { padding: 10px; background: #2a2a2a; margin: 5px 0; border-radius: 5px; transition: all 0.3s ease; }
-        #recent-checks li:hover { background: #333; transform: translateX(5px); }
-        @keyframes slideIn { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+
+        th { 
+            background: linear-gradient(135deg, #d4a4eb, #b19cd9);
+            color: #1a1a1a;
+            font-weight: 600;
+            text-shadow: none;
+        }
+
+        tr:nth-child(even) {
+            background: #252525;
+        }
+
+        tr:hover {
+            background: #333;
+        }
+
+        .username-cell {
+            font-weight: 600;
+            color: #e0e0e0;
+        }
+
+        .status-cell {
+            font-weight: 500;
+        }
+
+        .available { 
+            color: #50fa7b; 
+            text-shadow: 0 0 5px rgba(80, 250, 123, 0.3);
+        }
+
+        .taken { 
+            color: #ff5555; 
+            text-shadow: 0 0 5px rgba(255, 85, 85, 0.3);
+        }
+
+        .error { 
+            color: #ff79c6; 
+            text-shadow: 0 0 5px rgba(255, 121, 198, 0.3);
+        }
+
+        .inappropriate {
+            color: #f1c40f;
+            text-shadow: 0 0 5px rgba(241, 196, 15, 0.3);
+        }
+
+        .links-cell {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .link-btn {
+            padding: 8px 15px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 0.9em;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border: 1px solid;
+        }
+
+        .verify-btn {
+            background: rgba(139, 233, 253, 0.1);
+            border-color: #8be9fd;
+            color: #8be9fd;
+        }
+
+        .verify-btn:hover {
+            background: rgba(139, 233, 253, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .signup-btn {
+            background: rgba(80, 250, 123, 0.1);
+            border-color: #50fa7b;
+            color: #50fa7b;
+        }
+
+        .signup-btn:hover {
+            background: rgba(80, 250, 123, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .back-btn {
+            display: inline-block;
+            margin-top: 30px;
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #d4a4eb, #b19cd9);
+            color: #1a1a1a;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .back-btn:hover {
+            background: linear-gradient(135deg, #b19cd9, #9d7cc9);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(212, 164, 235, 0.4);
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 40px;
+            color: #888;
+        }
+
+        .no-results h3 {
+            color: #d4a4eb;
+            margin-bottom: 15px;
+        }
+
+        .filter-controls {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .filter-btn {
+            padding: 8px 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid #555;
+            color: #e0e0e0;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .filter-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: #d4a4eb;
+        }
+
+        .filter-btn.active {
+            background: rgba(212, 164, 235, 0.2);
+            border-color: #d4a4eb;
+            color: #d4a4eb;
+        }
+
+        .copy-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid #555;
+            color: #e0e0e0;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .copy-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: #d4a4eb;
+        }
+
+        @keyframes slideIn { 
+            from { transform: translateY(20px); opacity: 0; } 
+            to { transform: translateY(0); opacity: 1; } 
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 2.5em;
+            }
+            
+            .results-summary .stats {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .filter-controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .links-cell {
+                flex-direction: column;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>My Roblox Tools Hub - Results</h1>
+        <h1>🎯 Username Results</h1>
+        
         {% if results %}
-            <table>
-                <tr>
-                    <th>Username</th>
-                    <th>Status</th>
-                    <th>Links</th>
-                </tr>
-                {% for result in results %}
-                    <tr>
-                        <td>{{ result.username }}</td>
-                        <td class="{% if 'Available' in result.status %}available{% elif 'Taken' in result.status %}taken{% else %}error{% endif %}">
-                            {{ result.status }}
-                        </td>
-                        <td>
-                            <a href="{{ result.verify_url }}" target="_blank">Verify</a> |
-                            <a href="{{ result.signup_url }}" target="_blank">Sign Up</a>
-                        </td>
-                    </tr>
-                {% endfor %}
-            </table>
+            <div class="results-summary">
+                <h2>Search Results Summary</h2>
+                <div class="stats">
+                    <div class="stat-item">
+                        <div class="stat-number" id="total-count">{{ results|length }}</div>
+                        <div class="stat-label">Total Checked</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number available" id="available-count">0</div>
+                        <div class="stat-label">Available</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number taken" id="taken-count">0</div>
+                        <div class="stat-label">Taken</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="filter-controls">
+                <button class="filter-btn active" onclick="filterResults('all')">All Results</button>
+                <button class="filter-btn" onclick="filterResults('available')">Available Only</button>
+                <button class="filter-btn" onclick="filterResults('taken')">Taken Only</button>
+                <button class="copy-btn" onclick="copyAvailableUsernames()">Copy Available Usernames</button>
+            </div>
+
+            <div class="results-table-container">
+                <table id="results-table">
+                    <thead>
+                        <tr>
+                            <th>Username</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for result in results %}
+                            <tr class="result-row" data-status="{{ result.status }}">
+                                <td class="username-cell">{{ result.username }}</td>
+                                <td class="status-cell {% if 'Available' in result.status %}available{% elif 'Taken' in result.status %}taken{% elif 'Not Appropriate' in result.status %}inappropriate{% else %}error{% endif %}">
+                                    {{ result.status }}
+                                </td>
+                                <td>
+                                    <div class="links-cell">
+                                        <a href="{{ result.verify_url }}" target="_blank" class="link-btn verify-btn">🔍 Verify</a>
+                                        {% if 'Available' in result.status %}
+                                            <a href="{{ result.signup_url }}" target="_blank" class="link-btn signup-btn">🚀 Sign Up</a>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         {% else %}
-            <p>No results to display.</p>
+            <div class="no-results">
+                <h3>No Results Found</h3>
+                <p>No username results to display. Please go back and try a different search.</p>
+            </div>
         {% endif %}
-        <div id="recent-checks">
-            <h3>Recent Activity</h3>
-            <ul id="recent-checks-list"></ul>
+        
+        <div style="text-align: center;">
+            <a href="/" class="back-btn">🏠 Back to Tools Hub</a>
         </div>
-        <a href="/" style="display: block; text-align: center; margin-top: 20px; color: #d4a4eb; text-decoration: none; transition: color 0.3s ease;">Back to Tools</a>
     </div>
+
     <script>
-        function updateRecentChecks() {
-            const recentChecks = JSON.parse(localStorage.getItem('recentChecks') || '[]');
-            const list = document.getElementById('recent-checks-list');
-            list.innerHTML = '';
-            recentChecks.forEach(check => {
-                const li = document.createElement('li');
-                li.textContent = `${check.username}: ${check.status}`;
-                if (check.verify_url) {
-                    const verifyLink = document.createElement('a');
-                    verifyLink.href = check.verify_url;
-                    verifyLink.textContent = ' [Verify]';
-                    verifyLink.target = '_blank';
-                    li.appendChild(verifyLink);
+        function updateStats() {
+            const rows = document.querySelectorAll('.result-row');
+            let available = 0, taken = 0;
+            
+            rows.forEach(row => {
+                const status = row.dataset.status;
+                if (status.includes('Available')) {
+                    available++;
+                } else if (status.includes('Taken')) {
+                    taken++;
                 }
-                if (check.signup_url) {
-                    const signupLink = document.createElement('a');
-                    signupLink.href = check.signup_url;
-                    signupLink.textContent = ' [Sign Up]';
-                    signupLink.target = '_blank';
-                    li.appendChild(signupLink);
+            });
+            
+            document.getElementById('available-count').textContent = available;
+            document.getElementById('taken-count').textContent = taken;
+        }
+
+        function filterResults(filter) {
+            const rows = document.querySelectorAll('.result-row');
+            const buttons = document.querySelectorAll('.filter-btn');
+            
+            // Update button states
+            buttons.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Filter rows
+            rows.forEach(row => {
+                const status = row.dataset.status;
+                let show = true;
+                
+                if (filter === 'available') {
+                    show = status.includes('Available');
+                } else if (filter === 'taken') {
+                    show = status.includes('Taken');
                 }
-                list.appendChild(li);
+                
+                row.style.display = show ? '' : 'none';
             });
         }
 
-        updateRecentChecks();
+        function copyAvailableUsernames() {
+            const availableRows = document.querySelectorAll('.result-row[data-status*="Available"]');
+            const usernames = Array.from(availableRows).map(row => 
+                row.querySelector('.username-cell').textContent.trim()
+            );
+            
+            if (usernames.length === 0) {
+                alert('No available usernames to copy!');
+                return;
+            }
+            
+            const text = usernames.join('\n');
+            navigator.clipboard.writeText(text).then(() => {
+                const btn = event.target;
+                const originalText = btn.textContent;
+                btn.textContent = 'Copied!';
+                btn.style.background = 'rgba(80, 250, 123, 0.2)';
+                btn.style.borderColor = '#50fa7b';
+                btn.style.color = '#50fa7b';
+                
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                    btn.style.background = '';
+                    btn.style.borderColor = '';
+                    btn.style.color = '';
+                }, 2000);
+            }).catch(() => {
+                alert('Failed to copy to clipboard. Please copy manually.');
+            });
+        }
+
+        // Initialize stats on page load
+        updateStats();
     </script>
 </body>
 </html>
