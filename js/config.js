@@ -1,10 +1,15 @@
-// Configuration and constants
+// Configuration for browser-based operation
 const CONFIG = {
     API: {
-        BASE_URL: 'https://api.roblox.com',
+        // Roblox APIs that support CORS
         USERS_API: 'https://users.roblox.com/v1',
-        AUTH_API: 'https://auth.roblox.com/v2',
-        RATE_LIMIT: 100,
+        THUMBNAILS_API: 'https://thumbnails.roblox.com/v1',
+        
+        // Public CORS proxy (backup option)
+        CORS_PROXY: 'https://corsproxy.io/?',
+        
+        // Rate limiting
+        RATE_LIMIT: 60,
         TIMEOUT: 10000
     },
     VALIDATION: {
@@ -13,23 +18,17 @@ const CONFIG = {
         MIN_AGE: 13
     },
     STORAGE: {
-        PREFIX: 'utools_',
-        ENCRYPTION_KEY: 'your-encryption-key-here' // Change in production
-    },
-    SECURITY: {
-        CSRF_TOKEN_LENGTH: 32,
-        SESSION_TIMEOUT: 3600000, // 1 hour
-        MAX_ATTEMPTS: 5
+        PREFIX: 'utools_'
     }
 };
 
-// State management
+// Global state
 const STATE = {
     soundEnabled: true,
     matrixEnabled: false,
     darkTheme: true,
     apiRateLimit: { current: CONFIG.API.RATE_LIMIT, max: CONFIG.API.RATE_LIMIT },
     currentResults: [],
-    sessionData: {},
-    csrfToken: null
+    audioContext: null,
+    gridDots: []
 };
