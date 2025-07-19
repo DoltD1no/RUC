@@ -1,12 +1,5 @@
-// Security functions
+// Security and validation functions
 class Security {
-    // Generate CSRF token
-    static generateCSRFToken() {
-        const array = new Uint8Array(CONFIG.SECURITY.CSRF_TOKEN_LENGTH);
-        crypto.getRandomValues(array);
-        return Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('');
-    }
-
     // Input sanitization
     static sanitizeInput(input) {
         if (typeof input !== 'string') return '';
@@ -47,29 +40,7 @@ class Security {
         return password;
     }
 
-    // Simple encryption for session storage
-    static encrypt(data) {
-        try {
-            const jsonStr = JSON.stringify(data);
-            return btoa(encodeURIComponent(jsonStr));
-        } catch (e) {
-            console.error('Encryption failed:', e);
-            return null;
-        }
-    }
-
-    // Simple decryption for session storage
-    static decrypt(data) {
-        try {
-            const jsonStr = decodeURIComponent(atob(data));
-            return JSON.parse(jsonStr);
-        } catch (e) {
-            console.error('Decryption failed:', e);
-            return null;
-        }
-    }
-
-    // Rate limiting check
+    // Rate limiting
     static checkRateLimit() {
         if (STATE.apiRateLimit.current <= 0) {
             throw new Error('Rate limit exceeded. Please wait before making more requests.');
@@ -77,12 +48,10 @@ class Security {
         return true;
     }
 
-    // Update rate limit
     static updateRateLimit(cost = 1) {
         STATE.apiRateLimit.current = Math.max(0, STATE.apiRateLimit.current - cost);
         UI.updateRateLimitDisplay();
         
-        // Schedule rate limit reset
         if (STATE.apiRateLimit.current === 0) {
             setTimeout(() => {
                 STATE.apiRateLimit.current = STATE.apiRateLimit.max;
@@ -93,15 +62,13 @@ class Security {
     }
 }
 
-// Session management
+// Browser session management
 class SessionManager {
     static save(key, data) {
         try {
-            const encrypted = Security.encrypt(data);
-            if (encrypted) {
-                sessionStorage.setItem(`${CONFIG.STORAGE.PREFIX}${key}`, encrypted);
-                UI.showSessionIndicator();
-            }
+            const jsonStr = JSON.stringify(data);
+            sessionStorage.setItem(`${CONFIG.STORAGE.PREFIX}${key}`, jsonStr);
+            UI.showSessionIndicator();
         } catch (e) {
             console.error('Session save failed:', e);
         }
@@ -109,9 +76,9 @@ class SessionManager {
 
     static load(key) {
         try {
-            const encrypted = sessionStorage.getItem(`${CONFIG.STORAGE.PREFIX}${key}`);
-            if (encrypted) {
-                return Security.decrypt(encrypted);
+            const jsonStr = sessionStorage.getItem(`${CONFIG.STORAGE.PREFIX}${key}`);
+            if (jsonStr) {
+                return JSON.parse(jsonStr);
             }
         } catch (e) {
             console.error('Session load failed:', e);
