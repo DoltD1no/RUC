@@ -1,6 +1,6 @@
-// Roblox API integration
+// Roblox API integration with CORS handling
 class RobloxAPI {
-    // Check username availability
+    // Check username with CORS handling
     static async checkUsername(username) {
         Security.checkRateLimit();
         username = Security.validateUsername(username);
@@ -8,32 +8,99 @@ class RobloxAPI {
         try {
             Security.updateRateLimit(1);
             
-            // Check if username exists
-            const response = await fetch(`${CONFIG.API.USERS_API}/users/search?keyword=${encodeURIComponent(username)}&limit=10`, {
-                method: 'GET',
-                headers: {
-                    'Accept': 'application/json',
-                },
-                signal: AbortSignal.timeout(CONFIG.API.TIMEOUT)
-            });
+            let data;
+            
+            // Try direct API call first (works for some Roblox endpoints)
+            try {
+                const response = await fetch(
+                    `${CONFIG.API.USERS_API}/usernames/users`,
+                    {
+                        method: 'POST',
+                        headers: {
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            usernames: [username],
+                            excludeBannedUsers: true
+                        }),
+                        mode: 'cors'
+                    }
+                );
 
-            if (!response.ok) {
-                throw new Error(`API error: ${response.status}`);
+                if (response.ok) {
+                    data = await response.json();
+                } else {
+                    throw new Error('Direct API failed');
+                }
+            } catch (corsError) {
+                // Fallback: Use search endpoint (more likely to work)
+                try {
+                    const searchResponse = await fetch(
+                        `${CONFIG.API.USERS_API}/users/search?keyword=${encodeURIComponent(username)}&limit=10`,
+                        {
+                            method: 'GET',
+                            headers: {
+                                'Accept': 'application/json'
+                            },
+                            mode: 'cors'
+                        }
+                    );
+
+                    if (searchResponse.ok) {
+                        const searchData = await searchResponse.json();
+                        // Convert search format to match username check format
+                        const exactMatch = searchData.data?.find(user => 
+                            user.name.toLowerCase() === username.toLowerCase()
+                        );
+                        
+                        data = {
+                            data: exactMatch ? [{
+                                requestedUsername: username,
+                                id: exactMatch.id,
+                                name: exactMatch.name,
+                                displayName: exactMatch.displayName
+                            }] : []
+                        };
+                    } else {
+                        throw new Error('Search API failed');
+                    }
+                } catch (searchError) {
+                    // Last resort: Use CORS proxy
+                    console.log('Using CORS proxy fallback...');
+                    const proxyUrl = `${CONFIG.API.CORS_PROXY}${encodeURIComponent(
+                        `${CONFIG.API.USERS_API}/users/search?keyword=${username}&limit=10`
+                    )}`;
+                    
+                    const proxyResponse = await fetch(proxyUrl);
+                    if (proxyResponse.ok) {
+                        const searchData = await proxyResponse.json();
+                        const exactMatch = searchData.data?.find(user => 
+                            user.name.toLowerCase() === username.toLowerCase()
+                        );
+                        
+                        data = {
+                            data: exactMatch ? [{
+                                requestedUsername: username,
+                                id: exactMatch.id,
+                                name: exactMatch.name,
+                                displayName: exactMatch.displayName
+                            }] : []
+                        };
+                    } else {
+                        throw new Error('All API methods failed');
+                    }
+                }
             }
 
-            const data = await response.json();
-            
-            // Check if exact username match exists
-            const exactMatch = data.data?.find(user => 
-                user.name.toLowerCase() === username.toLowerCase()
-            );
-
+            // Process response
+            const userExists = data.data && data.data.length > 0;
             const result = {
                 username: username,
-                available: !exactMatch,
-                status: exactMatch ? 'Taken' : 'Available',
-                userId: exactMatch?.id || null,
-                displayName: exactMatch?.displayName || null
+                available: !userExists,
+                status: userExists ? 'Taken' : 'Available',
+                userId: userExists ? data.data[0].id : null,
+                displayName: userExists ? data.data[0].displayName : null
             };
 
             // Save to session
@@ -42,29 +109,14 @@ class RobloxAPI {
             return result;
 
         } catch (error) {
-            if (error.name === 'AbortError') {
-                throw new Error('Request timeout');
+            console.error('Username check error:', error);
+            
+            // Provide helpful error message
+            if (error.message.includes('CORS')) {
+                throw new Error('Unable to connect to Roblox API. Please try again later.');
             }
             throw error;
         }
-    }
-
-    // Validate username format with Roblox rules
-    static async validateUsernameFormat(username) {
-        // Additional Roblox-specific validation
-        const forbidden = ['roblox', 'robux', 'admin', 'moderator'];
-        const usernameLower = username.toLowerCase();
-        
-        for (const word of forbidden) {
-            if (usernameLower.includes(word)) {
-                return {
-                    valid: false,
-                    reason: 'Username contains forbidden words'
-                };
-            }
-        }
-
-        return { valid: true };
     }
 
     // Bulk check usernames
@@ -89,6 +141,7 @@ class RobloxAPI {
                 results.push({
                     username: usernames[i],
                     status: 'Error',
+                    available: null,
                     error: error.message
                 });
             }
@@ -97,7 +150,7 @@ class RobloxAPI {
         return results;
     }
 
-    // Generate usernames
+    // Username generators
     static generateUsernames(options) {
         const { type, length, count, randomOrder } = options;
         const usernames = [];
@@ -112,8 +165,14 @@ class RobloxAPI {
         
         const generator = generators[type] || generators.mixed;
         
-        for (let i = 0; i < count; i++) {
-            usernames.push(generator());
+        // Generate unique usernames
+        const usedUsernames = new Set();
+        while (usernames.length < count) {
+            const username = generator();
+            if (!usedUsernames.has(username)) {
+                usedUsernames.add(username);
+                usernames.push(username);
+            }
         }
         
         if (randomOrder) {
@@ -127,7 +186,6 @@ class RobloxAPI {
         return usernames;
     }
 
-    // Username generators
     static generateMixed(length) {
         const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
         let username = '';
@@ -147,7 +205,11 @@ class RobloxAPI {
     }
 
     static generateNumbers(length) {
-        return Math.floor(Math.random() * Math.pow(10, length)).toString().padStart(length, '0');
+        let username = '';
+        for (let i = 0; i < length; i++) {
+            username += Math.floor(Math.random() * 10).toString();
+        }
+        return username;
     }
 
     static generatePronounceable(length) {
