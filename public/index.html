@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>UTools - Roblox Username Checker & Tools</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛠️</text></svg>">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="ascii-bg" id="asciiBg"></div>
+    <div class="grid-background" id="gridBg"></div>
+    <div class="scanlines"></div>
+    <div class="matrix-rain" id="matrixRain"></div>
+    
+    <!-- Header Navigation -->
+    <header class="header-nav">
+        <div class="logo-section">
+            <a href="#" class="logo">UTOOLS</a>
+        </div>
+        
+        <nav class="nav-links">
+            <a href="#" class="nav-link">Username Tools</a>
+            <a href="#" class="nav-link">Account Services</a>
+            <a href="#" class="nav-link">API Docs</a>
+            <a href="#" class="nav-link">About</a>
+        </nav>
+        
+        <div class="nav-controls">
+            <button class="control-btn" id="themeToggle" title="Toggle Theme">🌙</button>
+            <button class="control-btn" id="soundToggle" title="Toggle Sound">🔊</button>
+            <button class="control-btn" id="matrixToggle" title="Toggle Matrix">⚡</button>
+            <button class="control-btn" id="commandPaletteBtn" title="Command Palette">⌘</button>
+            <div class="control-btn" id="rateLimitIndicator" title="API Rate Limit">
+                <span id="rateLimit">100/100</span>
+            </div>
+        </div>
+    </header>
+    
+    <div class="container">
+        <!-- Terminal Header -->
+        <div class="terminal-header">
+            <h1 class="glitch" data-text="UTOOLS">UTOOLS</h1>
+            <p class="terminal-subtitle">Roblox username checker & tools</p>
+        </div>
+
+        <!-- Main View -->
+        <div id="main-view">
+            <!-- Username Checker -->
+            <div class="tool-card">
+                <div class="tool-header">
+                    <div class="tool-icon">🔍</div>
+                    <div class="tool-title">Username Checker</div>
+                </div>
+                
+                <form id="username-form">
+                    <div class="form-grid">
+                        <div class="form-group" style="grid-column: 1 / -1;">
+                            <label class="form-label">Username</label>
+                            <input type="text" class="form-input" name="username" 
+                                   placeholder="Enter username to check" 
+                                   required minlength="3" maxlength="20" 
+                                   autocomplete="off">
+                        </div>
+                    </div>
+                    
+                    <div class="checkbox-container">
+                        <label class="checkbox-group">
+                            <div class="custom-checkbox">
+                                <input type="checkbox" name="detailed_check">
+                                <div class="checkbox-indicator"></div>
+                            </div>
+                            <span class="checkbox-label">Detailed check</span>
+                        </label>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">
+                        <span class="btn-text">Check username</span>
+                    </button>
+                    
+                    <div class="progress-container">
+                        <div class="progress-bar" style="width: 0%"></div>
+                    </div>
+                </form>
+                
+                <div class="terminal-output" id="username-output">
+                    <div class="terminal-line info">Ready to check usernames...</div>
+                </div>
+            </div>
+
+            <!-- Bulk Generator -->
+            <div class="tool-card">
+                <div class="tool-header">
+                    <div class="tool-icon">🎲</div>
+                    <div class="tool-title">Bulk Generator</div>
+                </div>
+                
+                <form id="bulk-form">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label">Length</label>
+                            <div class="number-input-container">
+                                <input type="number" class="form-input number-input" 
+                                       name="length" min="3" max="20" value="6" required>
+                                <div class="number-controls">
+                                    <button type="button" class="number-btn" 
+                                            data-action="increment" data-field="length">▲</button>
+                                    <button type="button" class="number-btn" 
+                                            data-action="decrement" data-field="length">▼</button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Type</label>
+                            <select class="form-input form-select" name="type" required>
+                                <option value="mixed">Mixed (Letters & Numbers)</option>
+                                <option value="letters">Letters Only</option>
+                                <option value="numbers">Numbers Only</option>
+                                <option value="pronounceable">Pronounceable</option>
+                                <option value="leetspeak">Leetspeak</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Max checks</label>
+                            <div class="number-input-container">
+                                <input type="text" class="form-input number-input" 
+                                       name="max_checks" value="10" id="max-checks-input">
+                                <div class="number-controls">
+                                    <button type="button" class="number-btn" 
+                                            data-action="increment" data-field="max_checks">▲</button>
+                                    <button type="button" class="number-btn" 
+                                            data-action="decrement" data-field="max_checks">▼</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="checkbox-container">
+                        <label class="checkbox-group">
+                            <div class="custom-checkbox">
+                                <input type="checkbox" name="check_generated" checked>
+                                <div class="checkbox-indicator"></div>
+                            </div>
+                            <span class="checkbox-label">Check availability</span>
+                        </label>
+                        
+                        <label class="checkbox-group">
+                            <div class="custom-checkbox">
+                                <input type="checkbox" name="random_order" checked>
+                                <div class="checkbox-indicator"></div>
+                            </div>
+                            <span class="checkbox-label">Random order</span>
+                        </label>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">
+                        <span class="btn-text">Generate usernames</span>
+                    </button>
+                    
+                    <div class="progress-container">
+                        <div class="progress-bar" style="width: 0%"></div>
+                    </div>
+                </form>
+                
+                <div class="terminal-output" id="bulk-output">
+                    <div class="terminal-line info">Generator initialized...</div>
+                </div>
+            </div>
+
+            <!-- Account Creator (Demo Mode) -->
+            <div class="tool-card">
+                <div class="tool-header">
+                    <div class="tool-icon">👤</div>
+                    <div class="tool-title">Account Creator</div>
+                </div>
+                
+                <form id="signup-form">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label">Username</label>
+                            <input type="text" class="form-input" name="signup_username" 
+                                   placeholder="Choose username" required 
+                                   minlength="3" maxlength="20" autocomplete="off">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Password</label>
+                            <input type="password" class="form-input" name="password" 
+                                   placeholder="Strong password" required 
+                                   minlength="8" autocomplete="new-password">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Birthday</label>
+                            <input type="date" class="form-input" name="birthday" 
+                                   required max="2010-01-01">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Gender</label>
+                            <select class="form-input form-select" name="gender" required>
+                                <option value="">Select gender</option>
+                                <option value="2">Male</option>
+                                <option value="3">Female</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="checkbox-container">
+                        <label class="checkbox-group">
+                            <div class="custom-checkbox">
+                                <input type="checkbox" name="agree_terms">
+                                <div class="checkbox-indicator"></div>
+                            </div>
+                            <span class="checkbox-label">I agree to terms</span>
+                        </label>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">
+                        <span class="btn-text">Create account</span>
+                    </button>
+                    
+                    <div class="progress-container">
+                        <div class="progress-bar" style="width: 0%"></div>
+                    </div>
+                </form>
+                
+                <div class="terminal-output" id="signup-output">
+                    <div class="terminal-line info">Account creator ready...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results View -->
+        <div id="results-view" class="results-view">
+            <div class="terminal-header">
+                <h1>Results</h1>
+            </div>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number" style="color: var(--primary);" id="total-results">0</div>
+                    <div class="stat-label">Total Checked</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" style="color: var(--success);" id="available-results">0</div>
+                    <div class="stat-label">Available</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" style="color: var(--error);" id="taken-results">0</div>
+                    <div class="stat-label">Taken</div>
+                </div>
+            </div>
+            
+            <div class="results-table">
+                <div class="table-controls">
+                    <button class="filter-btn active" onclick="filterResults('all')">All results</button>
+                    <button class="filter-btn" onclick="filterResults('available')">Available only</button>
+                    <button class="filter-btn" onclick="filterResults('taken')">Taken only</button>
+                    <button class="filter-btn" onclick="copyAvailable()">📋 Copy available</button>
+                    <button class="filter-btn" onclick="exportResults()">💾 Export CSV</button>
+                </div>
+                
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Username</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="results-tbody">
+                    </tbody>
+                </table>
+            </div>
+            
+            <div style="text-align: center; margin-top: 2rem;">
+                <button class="btn" onclick="showMain()">
+                    ← Back to tools
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Security Badge -->
+    <div class="security-badge">
+        Secure Connection • Browser-Based
+    </div>
+
+    <!-- Session Indicator -->
+    <div class="session-indicator" id="sessionIndicator">
+        <span>Session saved</span>
+    </div>
+
+    <!-- Command Palette -->
+    <div class="command-palette" id="commandPalette">
+        <input type="text" class="command-input" placeholder="Type a command or search..." id="commandInput">
+        <ul class="command-list" id="commandList"></ul>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/config.js"></script>
+    <script src="js/security.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/effects.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
